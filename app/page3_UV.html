@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>3D模型UV贴图编辑器</title>
+    <link rel="stylesheet" href="../styles/page3_UV.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧工具栏 -->
+        <div class="sidebar">
+            <!-- 模型控制区域 -->
+            <div class="model-section">
+                <h3>模型控制</h3>
+                <div class="model-info">
+                    <p id="modelName">默认立方体模型</p>
+                    <input type="file" id="modelInput" accept=".obj,.gltf,.glb,.fbx,.bin" multiple>
+                    <input type="file" id="folderInput" webkitdirectory directory multiple>
+                    <button id="resetModel" class="button">重置模型</button>
+                    <div class="control-options">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="highlightToggle" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">面高亮</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 贴图控制区域 -->
+            <div class="texture-section">
+                <h3>贴图控制</h3>
+                <div class="texture-actions">
+                    <input type="file" id="textureInput" accept="image/*" multiple>
+                    <div class="button-group">
+                        <button id="undoButton" class="button" disabled>撤销</button>
+                        <button id="redoButton" class="button" disabled>重做</button>
+                    </div>
+                </div>
+                <div id="texturePreview" class="texture-grid"></div>
+                <!-- 贴图历史浏览器 -->
+                <div class="texture-history">
+                    <h4>贴图历史</h4>
+                    <div id="textureHistoryList" class="history-list"></div>
+                </div>
+                <!-- 批量贴图控制 -->
+                <div class="batch-texture">
+                    <h4>批量贴图</h4>
+                    <div class="batch-options">
+                        <label>
+                            <input type="checkbox" id="batchSimilarFaces">
+                            应用到相似面
+                        </label>
+                        <label>
+                            <input type="checkbox" id="batchConnectedFaces">
+                            应用到相连面
+                        </label>
+                        <div class="similarity-threshold">
+                            <label for="similarityThreshold">相似度阈值</label>
+                            <input type="range" id="similarityThreshold" min="0.8" max="1" step="0.01" value="0.95">
+                            <span class="value-display">0.95</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UV映射控制区域 -->
+            <div class="mapping-controls">
+                <h3>UV映射控制</h3>
+                <div class="control-group">
+                    <label for="scaleU">U轴缩放</label>
+                    <input type="range" id="scaleU" min="0.1" max="5" step="0.1" value="1">
+                    <span class="value-display">1.0</span>
+                </div>
+                <div class="control-group">
+                    <label for="scaleV">V轴缩放</label>
+                    <input type="range" id="scaleV" min="0.1" max="5" step="0.1" value="1">
+                    <span class="value-display">1.0</span>
+                </div>
+                <div class="control-group">
+                    <label for="offsetU">U轴偏移</label>
+                    <input type="range" id="offsetU" min="-1" max="1" step="0.1" value="0">
+                    <span class="value-display">0.0</span>
+                </div>
+                <div class="control-group">
+                    <label for="offsetV">V轴偏移</label>
+                    <input type="range" id="offsetV" min="-1" max="1" step="0.1" value="0">
+                    <span class="value-display">0.0</span>
+                </div>
+                <div class="control-group">
+                    <label for="rotation">旋转角度</label>
+                    <input type="range" id="rotation" min="0" max="360" step="1" value="0">
+                    <span class="value-display">0°</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主视图区域 -->
+        <div class="viewer">
+            <div id="modelViewer"></div>
+            <div class="instructions">
+                <p>1. 点击模型表面选择要贴图的面</p>
+                <p>2. 选择或拖拽图片到选中的面上</p>
+                <p>3. 使用控制面板调整UV映射参数</p>
+                <p>4. 使用撤销/重做管理贴图历史</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+
+    <!-- 主程序 -->
+    <script type="module" src="../utils/page3/model_load.js"></script>
+    <script type="module" src="../utils/page3/main.js"></script>
+</body>
+</html>

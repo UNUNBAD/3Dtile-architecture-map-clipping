@@ -1,0 +1,1032 @@
+:root {
+    --primary-color: #2196F3;
+    --secondary-color: #FF4081;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+    /* --dark-bg: rgba(33, 33, 33, 0.7); */
+    --light-bg: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(255, 255, 255, 0.8);
+    --hover-bg: rgba(255, 255, 255, 0.25);
+    --common-radius: 6px;
+    --common-padding: 12px 20px;
+    --common-border: 1px solid var(--border-color);
+    --common-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --common-transition: all 0.3s ease;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+#app {
+    height: 100vh;
+    background-color: #f5f5f5;
+}
+.split-container {
+    display: flex;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.viewer {
+    flex: 1;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.viewer:first-child {
+    border-right: 2px solid var(--primary-color);
+}
+.control-panel {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: var(--dark-bg);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.control-panel button {
+    margin: 0 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.control-panel button:hover {
+    background: #1976D2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+.screenshot-controls {
+    position: absolute;
+    top: 80px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+.left-screenshot {
+    left: 20px;
+}
+.right-screenshot {
+    right: 20px;
+}
+/* 可以删除的样式类 */
+.screenshot-button {
+    display: none; /* 或完全删除这个类 */
+}
+.screenshot-hint {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-bg);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: none; /* 默认隐藏 */
+}
+.screenshot-result {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--light-bg);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 2000;
+}
+.screenshot-result img {
+    max-width: 800px;
+    max-height: 600px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.top-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-bg);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    font-family: monospace;
+    display: flex;
+    gap: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+.coordinate-item {
+    display: flex;
+    gap: 8px;
+}
+.coordinate-value {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+/* 左右分屏的坐标信息框样式 */
+#leftCoordinateInfo {
+    left: 20px;
+    right: auto;
+}
+#rightCoordinateInfo {
+    right: 20px;
+}
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--light-bg);
+    border-radius: var(--common-radius);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--common-radius);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: white;
+}
+/* 添加加载动画 */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background: var(--dark-bg);
+    padding: 20px 40px;
+    border-radius: 8px;
+    display: none;
+}
+.loading.active {
+    display: block;
+}
+.model-controls {
+    position: absolute;
+    top: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+
+.left-controls {
+    left: 20px;
+}
+
+.right-controls {
+    right: 20px;
+}
+
+.model-button {
+    background: var(--dark-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+}
+
+.model-button i {
+    font-size: 20px;
+}
+
+.model-button:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.model-button.load {
+    background: var(--success-color);
+}
+
+.model-button.remove {
+    background: var(--danger-color);
+}
+
+.model-button.load:hover {
+    background: #388E3C;
+}
+
+.model-button.remove:hover {
+    background: #D32F2F;
+}
+
+/* 添加工具提示 */
+.model-button-tooltip {
+    position: relative;
+}
+
+.model-button-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-bg);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.model-button-tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.screenshot-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.action-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-button:hover {
+    background: #1976D2;
+    transform: translateY(-1px);
+}
+
+.action-button i {
+    font-size: 16px;
+}
+
+/* 添加分隔线样式 */
+.control-separator {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 8px 0;
+}
+
+/* 添加截图状态信息样式 */
+.screenshot-status {
+    position: fixed;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-bg);
+    color: var(--success-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    z-index: 1001;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: none; /* 默认隐藏 */
+}
+
+.cancel-screenshot {
+    background: var(--danger-color);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.cancel-screenshot:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
+}
+
+/* 修改hint样式 */
+#screenshotHint {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-bg);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 设置按钮和面板样式 */
+.settings-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 2000;
+    background: var(--dark-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-panel {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--light-bg);
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 2001;
+    min-width: 300px;
+}
+
+.settings-item {
+    margin-bottom: 15px;
+}
+
+.settings-item label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.settings-item input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.settings-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* 添加保存成功提示样式 */
+.save-success-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2000;
+    animation: fadeOut 2s forwards;
+}
+
+.save-success-toast i {
+    color: #4CAF50;
+    font-size: 20px;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* 设置保存提示样式 */
+.settings-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.settings-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.settings-toast i {
+    font-size: 18px;
+}
+
+.settings-toast.success-toast i {
+    color: #52c41a;
+}
+
+.settings-toast.error-toast i {
+    color: #ff4d4f;
+}
+
+.settings-toast span {
+    font-size: 14px;
+    color: #333;
+}
+
+/* 路径输入组样式 */
+.path-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.browse-button {
+    background: var(--primary-color);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.browse-button:hover {
+    background: #1976D2;
+}
+
+/* 文件浏览器样式更新 */
+.file-explorer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    max-height: 250px;
+    background: var(--dark-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+}
+
+.file-explorer-header {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+}
+
+.file-list {
+    font-size: 13px;
+    padding: 2px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 6px;
+    color: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    margin-bottom: 1px;
+    white-space: nowrap;
+}
+
+.file-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.file-item i {
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.file-name {
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+}
+
+.file-time {
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: auto;
+    font-size: 10px;
+}
+
+/* 最新文件的高亮样式 */
+.file-item:first-child {
+    background: rgba(33, 150, 243, 0.15);
+}
+
+.file-item:first-child:hover {
+    background: rgba(33, 150, 243, 0.25);
+}
+.left-side-controls {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.control-button {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 10px 15px;
+    border-radius: var(--common-radius);
+    cursor: pointer;
+    transition: var(--common-transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    backdrop-filter: blur(5px);
+    width: 160px;
+}
+
+.control-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-2px);
+    box-shadow: var(--common-shadow);
+}
+
+.control-button i {
+    width: 20px;
+    text-align: center;
+}
+
+/* 合并文件列表样式 */
+.combined-list {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 300px;
+    background: var(--dark-bg);
+    border-radius: 8px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    color: white;
+    z-index: 1000;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.list-section {
+    margin-bottom: 20px;
+}
+
+.list-section h3 {
+    margin:0px;
+    /* margin-bottom: 10px; */
+    font-size: 16px;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.list-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.item-name {
+    flex: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.item-action-btn {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.item-action-btn:hover {
+    background: white;
+    color: var(--primary-color);
+}
+
+.refresh-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.refresh-button:hover {
+    color: white;
+}
+
+/* 移除不需要的样式 */
+.right-screenshot,
+.model-controls,
+.model-list,
+.file-explorer {
+    display: none;
+}
+
+/* 修改分屏容器样式 */
+.split-container {
+    display: block;  /* 改为block布局 */
+    height: 100%;
+    position: relative;
+}
+
+/* 修改左侧viewer样式 */
+#leftViewer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* 修改右侧viewer为浮动窗口 */
+#rightViewer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 20%;
+    height: 20%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border: 2px solid var(--primary-color);
+}
+
+/* 右侧控制按钮位置调整 */
+.right-controls {
+    right: 5px;
+    top: 5px;
+    transform: scale(0.8);
+}
+
+/* 添加已导入模型列表样式 */
+.model-list {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 300px;
+    background: var(--dark-bg);
+    border-radius: 8px;
+    padding: 15px;
+    color: white;
+    z-index: 1000;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.model-list h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+.model-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.model-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.model-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.model-action-btn {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.model-action-btn:hover {
+    background: white;
+    color: var(--primary-color);
+}
+
+/* 修改模型选择对话框样式 */
+.model-select-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--dark-bg);
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 2000;
+    width: 800px;
+    display: none;
+}
+
+.model-select-dialog h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.model-select-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+.model-select-item {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 2px solid transparent;
+}
+
+.model-select-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+}
+
+.model-select-item.selected {
+    border-color: var(--primary-color);
+    background: rgba(33, 150, 243, 0.2);
+}
+
+.model-path {
+    font-size: 12px;
+    color: #aaa;
+    word-break: break-all;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.dialog-button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+.dialog-button.confirm {
+    background: var(--primary-color);
+    color: white;
+}
+
+.dialog-button.cancel {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.dialog-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-button.confirm:hover {
+    background: #1976D2;
+}
+
+.dialog-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 添加路径提示的样式 */
+.save-path-hint {
+    color: #ff4444;
+    font-size: 12px;
+    padding: 5px;
+    text-align: center;
+    display: none;
+}
+
+/* 统一按钮样式 */
+.control-button,
+.action-button,
+.model-button,
+.settings-button,
+.cancel-screenshot,
+.dialog-button,
+.browse-button,
+.upload-btn {
+    background: var(--light-bg);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: var(--common-padding);
+    border-radius: var(--common-radius);
+    cursor: pointer;
+    transition: var(--common-transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.control-button:hover,
+.action-button:hover,
+.model-button:hover,
+.settings-button:hover,
+.cancel-screenshot:hover,
+.dialog-button:hover,
+.browse-button:hover,
+.upload-btn:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--common-shadow);
+}
+
+/* 统一面板样式 */
+.settings-panel,
+.model-select-dialog,
+.screenshot-result,
+.combined-list,
+.tiles-list,
+.file-explorer {
+    background: var(--dark-bg);
+    border: var(--common-border);
+    border-radius: var(--common-radius);
+    box-shadow: var(--common-shadow);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+/* 统一信息框样式 */
+.top-dock,
+.screenshot-status,
+.screenshot-hint,
+.settings-toast,
+.save-success-toast {
+    background: var(--dark-bg);
+    border: var(--common-border);
+    border-radius: var(--common-radius);
+    color: white;
+    padding: var(--common-padding);
+    backdrop-filter: blur(10px);
+}
+
+/* 统一列表项样式 */
+.file-item,
+.model-item,
+.tileset-item,
+.list-item {
+    background: var(--light-bg);
+    border: var(--common-border);
+    border-radius: var(--common-radius);
+    padding: 8px 12px;
+    margin: 4px 0;
+    transition: var(--common-transition);
+}
+
+.file-item:hover,
+.model-item:hover,
+.tileset-item:hover,
+.list-item:hover {
+    background: var(--hover-bg);
+}
+
+/* 统一小视图样式 */
+#rightViewer {
+    border: 2px solid var(--border-color);
+    border-radius: var(--common-radius);
+    overflow: hidden;
+    box-shadow: var(--common-shadow);
+}
+
+/* 统一输入框样式 */
+input[type="text"] {
+    background: var(--light-bg);
+    border: var(--common-border);
+    border-radius: var(--common-radius);
+    color: white;
+    padding: 8px 12px;
+}
+
+input[type="text"]:focus {
+    background: var(--hover-bg);
+    outline: none;
+}
+
+/* 统一标题样式 */
+h2, h3 {
+    color: white;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+/* 修改滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-bg);
+    border-radius: var(--common-radius);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--common-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: white;
+}
+
+/* 保持其他必要的特定样式 */

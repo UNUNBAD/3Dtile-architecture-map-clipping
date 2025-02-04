@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3Dtile建筑贴图拾取</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/page0_home.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>3Dtile建筑贴图拾取</h1>
+        <!-- <p class="description">
+            欢迎使用GIS数据可视化平台。这是一个强大的工具，可以帮助您进行地理信息数据的可视化和分析。
+            通过我们的平台，您可以轻松处理和查看各种GIS数据。
+        </p> -->
+        
+        <!-- 添加3DTiles管理部分 -->
+        <div class="tiles-management">
+            <h2>3DTiles 文件管理</h2>
+            <div class="tiles-upload">
+                <button class="btn upload-btn" onclick="openFileDialog()">
+                    <i class="fas fa-upload"></i>
+                    选择tileset.json文件
+                </button>
+            </div>
+            
+            <div class="tiles-list">
+                <h3>已导入的3DTiles文件</h3>
+                <div id="tilesetList" class="tileset-items">
+                    <!-- 3DTiles列表将通过JavaScript动态添加 -->
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="btn">
+            <i class="fas fa-map"></i>
+            进入主应用
+        </a>
+        <a href="page2_process.html" class="btn">
+            <i class="fas fa-cogs"></i>
+            数据处理工具
+        </a>
+    </div>
+    <div class="footer">
+        © 3Dtile建筑贴图拾取 | @XCU 
+    </div>
+
+    <script>
+        // 存储已导入的3DTiles文件信息
+        let importedTilesets = [];
+
+        // 打开文件选择对话框
+        async function openFileDialog() {
+            try {
+                const { dialog } = require('@electron/remote');
+                const result = await dialog.showOpenDialog({
+                    properties: ['openFile'],
+                    filters: [
+                        { name: 'Tileset JSON', extensions: ['json'] }
+                    ]
+                });
+
+                if (!result.canceled && result.filePaths.length > 0) {
+                    const filePath = result.filePaths[0];
+                    
+                    // 检查是否是tileset.json文件
+                    if (!filePath.toLowerCase().endsWith('tileset.json')) {
+                        alert('请选择tileset.json文件');
+                        return;
+                    }
+
+                    // 检查文件是否已存在
+                    const exists = importedTilesets.some(t => t.path === filePath);
+                    if (exists) {
+                        alert('该文件已经导入过了');
+                        return;
+                    }
+
+                    // 添加到已导入列表
+                    const tilesetInfo = {
+                        id: Date.now(),
+                        name: filePath.split(/[\\/]/).pop(),
+                        path: filePath
+                    };
+
+                    importedTilesets.push(tilesetInfo);
+                    localStorage.setItem('importedTilesets', JSON.stringify(importedTilesets));
+                    updateTilesetList();
+                }
+            } catch (error) {
+                console.error('Error opening file dialog:', error);
+                alert('打开文件选择对话框时出错：' + error.message);
+            }
+        }
+
+        // 更新3DTiles文件列表显示
+        function updateTilesetList() {
+            const listElement = document.getElementById('tilesetList');
+            if (!listElement) return;
+
+            listElement.innerHTML = '';
+
+            importedTilesets.forEach(tileset => {
+                const item = document.createElement('div');
+                item.className = 'tileset-item';
+                item.innerHTML = `
+                    <div class="tileset-info">
+                        <div class="tileset-name">${tileset.name}</div>
+                        <div class="tileset-path" title="${tileset.path}">${tileset.path}</div>
+                    </div>
+                    <div class="tileset-actions">
+                        <button class="tileset-action-btn" onclick="removeTileset(${tileset.id})" title="删除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                listElement.appendChild(item);
+            });
+        }
+
+        // 删除tileset
+        function removeTileset(id) {
+            importedTilesets = importedTilesets.filter(t => t.id !== id);
+            localStorage.setItem('importedTilesets', JSON.stringify(importedTilesets));
+            updateTilesetList();
+        }
+
+        // 页面加载时从localStorage加载已保存的tilesets
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('importedTilesets');
+            if (saved) {
+                try {
+                    importedTilesets = JSON.parse(saved);
+                    console.log('Loaded saved tilesets:', importedTilesets);
+                    updateTilesetList();
+                } catch (error) {
+                    console.error('Error loading saved tilesets:', error);
+                    importedTilesets = [];
+                    localStorage.removeItem('importedTilesets');
+                }
+            }
+        });
+
+        // 添加选择模型的函数
+        function selectModelForViewer(path, side) {
+            // 将选择的模型路径存储到localStorage
+            localStorage.setItem(side === 'left' ? 'selectedLeftModel' : 'selectedRightModel', path);
+            // 跳转到查看器页面
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

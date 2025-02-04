@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesium Split View</title>
+    <!-- 添加Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 引入Cesium资源 -->
+    <!-- <link href="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Widgets/widgets.css" rel="stylesheet"> -->
+    <!-- <script src="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Cesium.js"></script> -->
+    <link rel="stylesheet" href="./../cesium/Cesium1.98/Widgets/widgets.css" rel="stylesheet">
+    <script type="text/javascript" src="./../cesium/Cesium1.98/Cesium.js"></script>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <link rel="stylesheet" href="../styles/cesium-split.css">
+    <style>
+        /* 统一左侧按钮样式 */
+
+    </style>
+    <script>
+        // 全局变量定义，供其他JS文件使用
+        window.globalVars = {
+            leftViewer: null,
+            rightViewer: null,
+            leftTileset: null,
+            rightTileset: null,
+            screenshotManagers: {},
+            currentScreenshot: null,
+            settings: {
+                leftMapEnabled: true,
+                rightMapEnabled: true,
+                savePath: '',
+                enablePythonProcess: false,
+                outputPath: '',
+                monitorPath: '',
+                enableAutoMonitor: false
+            }
+        };
+    </script>
+    <!-- 引入截图工具 -->
+    <script src="../utils/intercept.js"></script>
+    <!-- 引入文件处理函数 -->
+    <script src="../utils/file_function.js"></script>
+    <!-- 引入点击事件处理脚本 -->
+    <script src="../utils/onclick_redpot.js"></script>
+    <script src="../utils/img_cut.js"></script>
+    <script src="../utils/coordinate_info.js"></script>
+    <script src="../utils/view_sync.js"></script>
+    <script src="../utils/page_setting.js"></script>
+</head>
+<body>
+    <!-- 左侧统一控制按钮 -->
+    <div class="left-side-controls">
+        <a href="home.html" class="control-button">
+            <i class="fas fa-home"></i>
+            返回主页
+        </a>
+        <!-- <a href="page2_process.html" class="control-button">
+            <i class="fas fa-cogs"></i>
+            数据处理
+        </a> -->
+        <button class="control-button" onclick="showModelSelectDialog()">
+            <i class="fas fa-cube"></i>
+            加载模型
+        </button>
+        <button class="control-button" onclick="removeLeftModel()">
+            <i class="fas fa-trash-alt"></i>
+            移除模型
+        </button>
+        <button class="control-button" onclick="initCesiumQuadrilateralScreenshot(window.globalVars.leftViewer)">
+            <i class="fas fa-vector-square"></i>
+            四点截图
+        </button>
+    </div>
+
+    <!-- 合并的文件列表 -->
+    <div class="combined-list">
+        <div class="list-section">
+            <h3>
+                已保存文件
+                <button onclick="refreshFileList()" class="refresh-button">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </h3>
+            <div id="savePathHint" class="save-path-hint" style="color: antiquewhite;">请先设置保存路径</div>
+            <div class="file-list"></div>
+        </div>
+        <!-- <div class="list-section">
+            <h3>已导入的3DTiles模型</h3>
+            <div id="modelList"></div>
+        </div> -->
+    </div>
+
+    <!-- 顶部坐标信息栏 -->
+    <div class="top-dock">
+        <div class="coordinate-item">
+            <span>屏幕坐标:</span>
+            <span class="coordinate-value" id="screenCoord">X: 0, Y: 0</span>
+        </div>
+        <div class="coordinate-item">
+            <span>经度:</span>
+            <span class="coordinate-value" id="longitude">0.000000</span>°
+        </div>
+        <div class="coordinate-item">
+            <span>纬度:</span>
+            <span class="coordinate-value" id="latitude">0.000000</span>°
+        </div>
+        <div class="coordinate-item">
+            <span>高程:</span>
+            <span class="coordinate-value" id="height">0.00</span>m
+        </div>
+    </div>
+
+    <!-- 截图状态信息 -->
+    <div id="screenshotStatus" class="screenshot-status" style="display: none;"></div>
+
+    <!-- 截图提示 -->
+    <div id="screenshotHint"></div>
+
+    <!-- 取消截图按钮 -->
+    <button class="cancel-screenshot" onclick="cancelQuadrilateralScreenshot()" style="display: none;">
+        <i class="fas fa-times"></i>
+        取消截图
+    </button>
+
+    <div class="screenshot-result" id="screenshotResult">
+        <img id="screenshotImage" alt="截图预览">
+        <br>
+        <div class="screenshot-actions">
+            <button class="action-button" onclick="downloadScreenshot()">
+                <i class="fas fa-download"></i> 下载
+            </button>
+            <button class="action-button" onclick="closeScreenshot()">
+                <i class="fas fa-times"></i> 关闭
+            </button>
+        </div>
+    </div>
+    <div id="app">
+        <div class="split-container">
+            <div id="leftViewer" class="viewer"></div>
+            <div id="rightViewer" class="viewer"></div>
+        </div>
+    </div>
+
+    <div class="loading" id="modelLoading">
+        <div>加载中...</div>
+    </div>
+
+    <!-- 设置按钮 -->
+    <button class="settings-button model-button-tooltip" 
+            onclick="toggleSettings()"
+            data-tooltip="设置">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- 设置面板 -->
+    <div id="settingsPanel" class="settings-panel">
+        <h3>设置</h3>
+        <div class="settings-item">
+            <label>
+                <input type="checkbox" id="leftMapEnabled" checked> 启用左侧地图
+            </label>
+        </div>
+        <div class="settings-item">
+            <label>
+                <input type="checkbox" id="rightMapEnabled" checked> 启用右下地图
+            </label>
+        </div>
+        <div class="settings-item">
+            <label>截图默认保存路径：</label>
+            <div class="path-input-group">
+                <input type="text" id="savePath" placeholder="请输入保存路径">
+                <!-- <button onclick="browsePath('savePath')" class="browse-button">
+                    <i class="fas fa-folder-open"></i>
+                </button> -->
+            </div>
+        </div>
+        <div class="settings-item">
+            <label>
+                <input type="checkbox" id="enablePythonProcess"> 启用Python图像处理
+            </label>
+        </div>
+        <div class="settings-item">
+            <label>截图输出目录：</label>
+            <div class="path-input-group">
+                <input type="text" id="outputPath" placeholder="请输入截图输出目录">
+                <!-- <button onclick="browsePath('outputPath')" class="browse-button">
+                    <i class="fas fa-folder-open"></i>
+                </button> -->
+            </div>
+        </div>
+        <div class="settings-item">
+            <label>监控目录：</label>
+            <div class="path-input-group">
+                <input type="text" id="monitorPath" placeholder="请输入需要监控的目录">
+                <!-- <button onclick="browsePath('monitorPath')" class="browse-button">
+                    <i class="fas fa-folder-open"></i>
+                </button> -->
+            </div>
+        </div>
+        <div class="settings-item">
+            <label>
+                <input type="checkbox" id="enableAutoMonitor"> 启用自动监控
+            </label>
+        </div>
+        <div class="screenshot-actions">
+            <button class="action-button" onclick="saveSettings()">
+                <i class="fas fa-save"></i> 保存
+            </button>
+            <button class="action-button" onclick="toggleSettings()">
+                <i class="fas fa-times"></i> 关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 添加模型选择对话框 -->
+    <div id="modelSelectDialog" class="model-select-dialog">
+        <h3>选择要加载的模型</h3>
+        <div id="modelSelectList" class="model-select-list">
+            <div class="model-select-item" onclick="selectModelForMainView(this, 'path/to/model1')">
+                <div class="model-title">主视图模型</div>
+                <div class="model-path">点击此区域为主视图加载模型</div>
+            </div>
+            <div class="model-select-item" onclick="selectModelForMiniView(this, 'path/to/model2')">
+                <div class="model-title">小视图模型</div>
+                <div class="model-path">点击此区域为右下角小视图加载模型</div>
+            </div>
+        </div>
+        <div class="dialog-actions">
+            <button class="dialog-button confirm" onclick="confirmModelSelection()">确认</button>
+            <button class="dialog-button cancel" onclick="closeModelSelectDialog()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 设置Cesium Ion访问令牌
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZjQ5ZGUzNC1jNWYwLTQ1ZTMtYmNjYS05YTY4ZTVmN2I2MDkiLCJpZCI6MTE3MTM4LCJpYXQiOjE2NzY0NDUyODB9.ZaNSBIfc1sGLhQd_xqhiSsc0yr8oS0wt1hAo9gbke6M";
+
+        // 等待DOM加载完成
+        window.onload = function() {
+            // 初始化左侧Viewer
+            globalVars.leftViewer = new Cesium.Viewer('leftViewer', {
+                scene3DOnly: true,
+                timeline: false,
+                animation: false,
+                navigationHelpButton: false,   // 移除帮助按钮
+                baseLayerPicker: false,        // 移除图层选择器
+                geocoder: false,               // 移除地理编码器
+                homeButton: false,             // 移除Home按钮
+                sceneModePicker: false,        // 移除场景模式选择器
+                selectionIndicator: false,     // 移除选择指示器
+                infoBox: false,                // 移除信息框
+                fullscreenButton: false,       // 移除全屏按钮
+                creditContainer: document.createElement('div'), // 移除版权信息
+                // 添加以下配置以支持截图
+                contextOptions: {
+                    webgl: {
+                        alpha: true,
+                        depth: true,
+                        stencil: true,
+                        antialias: true,
+                        premultipliedAlpha: true,
+                        preserveDrawingBuffer: true,
+                        failIfMajorPerformanceCaveat: true
+                    }
+                }
+            });
+
+            // 初始化右侧Viewer
+            globalVars.rightViewer = new Cesium.Viewer('rightViewer', {
+                scene3DOnly: true,
+                timeline: false,
+                animation: false,
+                navigationHelpButton: false,   // 移除帮助按钮
+                baseLayerPicker: false,        // 移除图层选择器
+                geocoder: false,               // 移除地理编码器
+                homeButton: false,             // 移除Home按钮
+                sceneModePicker: false,        // 移除场景模式选择器
+                selectionIndicator: false,     // 移除选择指示器
+                infoBox: false,                // 移除信息框
+                fullscreenButton: false,       // 移除全屏按钮
+                creditContainer: document.createElement('div'), // 移除版权信息
+                // 添加以下配置以支持截图
+                contextOptions: {
+                    webgl: {
+                        alpha: true,
+                        depth: true,
+                        stencil: true,
+                        antialias: true,
+                        premultipliedAlpha: true,
+                        preserveDrawingBuffer: true,
+                        failIfMajorPerformanceCaveat: true
+                    }
+                }
+            });
+
+            // 设置东八区正午12点
+            const now = new Date();
+            now.setUTCHours(4, 0, 0, 0); // UTC+8 的正午12点对应 UTC 4点
+            const julianDate = Cesium.JulianDate.fromDate(now);
+            globalVars.leftViewer.clock.currentTime = julianDate;
+            globalVars.rightViewer.clock.currentTime = julianDate;
+
+            // // 开启帧率显示
+            // globalVars.leftViewer.scene.debugShowFramesPerSecond = true;
+            // globalVars.rightViewer.scene.debugShowFramesPerSecond = true;
+
+            // 同步两个视图的相机
+            synchronizeCameras(globalVars.leftViewer, globalVars.rightViewer);
+
+            // 处理页面卸载时的清理
+            window.addEventListener('beforeunload', () => {
+                globalVars.leftViewer.destroy();
+                globalVars.rightViewer.destroy();
+                Object.values(globalVars.screenshotManagers).forEach(manager => manager.destroy());
+            });
+
+            // 加载设置
+            loadSettings();
+        };
+
+        // 移除原有的 synchronizeCameras 函数
+    </script>
+</body>
+</html>

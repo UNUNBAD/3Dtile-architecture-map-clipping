@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据处理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #FF4081;
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --danger-color: #F44336;
+            --dark-bg: rgba(33, 33, 33, 0.7);
+            --light-bg: rgba(255, 255, 255, 0.15);
+            --border-color: rgba(255, 255, 255, 0.8);
+            --hover-bg: rgba(255, 255, 255, 0.25);
+            --common-radius: 6px;
+            --common-padding: 12px 20px;
+            --common-border: 1px solid var(--border-color);
+            --common-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --common-transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            padding: 20px;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        /* 左侧控制面板 */
+        .control-sidebar {
+            background: var(--dark-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            height: 100%;
+        }
+
+        .control-button {
+            background: var(--light-bg);
+            border: var(--common-border);
+            color: white;
+            padding: 10px 15px;
+            border-radius: var(--common-radius);
+            cursor: pointer;
+            transition: var(--common-transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .control-button:hover {
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+            box-shadow: var(--common-shadow);
+        }
+
+        .settings-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            color: white;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--light-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            color: white;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            background: var(--hover-bg);
+            outline: none;
+        }
+
+        /* 右侧主要内容区 */
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .status-panel {
+            background: var(--dark-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .log-area {
+            background: var(--dark-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            padding: 15px;
+            color: #98ff98;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-y: auto;
+            height: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .file-list-container {
+            background: var(--dark-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            padding: 15px;
+            color: white;
+            height: 300px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .file-group {
+            background: var(--light-bg);
+            border: var(--common-border);
+            border-radius: var(--common-radius);
+            margin: 8px 0;
+            padding: 12px;
+            transition: var(--common-transition);
+        }
+
+        .file-group:hover {
+            background: var(--hover-bg);
+        }
+
+        .file-info {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-status {
+            text-align: center;
+        }
+
+        .file-time {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        #status {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            background: var(--light-bg);
+            border: var(--common-border);
+        }
+
+        #status.processing {
+            background: var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        #status.success {
+            background: var(--success-color);
+        }
+
+        #status.error {
+            background: var(--danger-color);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+            border-radius: var(--common-radius);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: var(--common-radius);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- 左侧控制面板 -->
+        <div class="control-sidebar">
+            <a href="home.html" class="control-button">
+                <i class="fas fa-arrow-left"></i>
+                返回主页
+            </a>
+
+            <div class="settings-panel">
+                <div class="input-group">
+                    <label><i class="fas fa-folder-open"></i> 输入文件夹:</label>
+                    <input type="text" id="inputFolder" value="">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-folder"></i> 输出文件夹:</label>
+                    <input type="text" id="outputFolder" value="">
+                </div>
+            </div>
+
+            <div class="control-button" onclick="startProcessing()">
+                <i class="fas fa-play"></i>
+                开始处理
+            </div>
+
+            <div class="control-button" onclick="stopProcessing()">
+                <i class="fas fa-stop"></i>
+                停止处理
+            </div>
+        </div>
+
+        <!-- 右侧主要内容区 -->
+        <div class="main-content">
+            <div class="status-panel">
+                <h3>
+                    <i class="fas fa-circle-notch"></i>
+                    处理状态
+                </h3>
+                <span id="status">未启动</span>
+            </div>
+
+            <div class="log-area" id="logArea">
+                等待开始处理...
+            </div>
+
+            <div class="file-list-container">
+                <h3><i class="fas fa-file-alt"></i> 文件列表</h3>
+                <div id="fileList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="page2_process.js"></script>
+</body>
+</html>

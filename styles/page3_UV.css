@@ -1,0 +1,488 @@
+:root {
+    --primary-color: #4CAF50;
+    --primary-hover: #45a049;
+    --background-color: #f5f5f5;
+    --sidebar-width: 320px;
+    --border-radius: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background-color);
+    color: #333;
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+    width: var(--sidebar-width);
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 主视图区域样式 */
+.viewer {
+    flex: 1;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+#modelViewer {
+    width: 100%;
+    height: 100%;
+}
+
+/* 控制组样式 */
+.model-section,
+.texture-section,
+.mapping-controls {
+    background: #fafafa;
+    border-radius: var(--border-radius);
+    padding: 16px;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #2c3e50;
+}
+
+.control-group {
+    margin-bottom: 16px;
+}
+
+.control-group:last-child {
+    margin-bottom: 0;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+/* 输入控件样式 */
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px dashed #ddd;
+    border-radius: var(--border-radius);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+input[type="file"]:hover {
+    border-color: var(--primary-color);
+}
+
+input[type="range"] {
+    width: 100%;
+    margin: 8px 0;
+    -webkit-appearance: none;
+    background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+/* 按钮样式 */
+.button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.button:hover {
+    background-color: var(--primary-hover);
+}
+
+.button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 预览区域样式 */
+#texturePreview {
+    width: 100%;
+    height: 150px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fff;
+}
+
+#texturePreview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 说明文本样式 */
+.instructions {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    max-width: 300px;
+}
+
+.instructions p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.instructions p:last-child {
+    margin-bottom: 0;
+}
+
+/* 数值显示样式 */
+.value-display {
+    font-size: 12px;
+    color: #666;
+    margin-left: 8px;
+}
+
+/* 模型信息样式 */
+.model-info {
+    margin-bottom: 12px;
+}
+
+.model-info p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        max-height: 300px;
+    }
+    
+    .viewer {
+        height: calc(100vh - 340px);
+    }
+}
+
+/* 贴图操作区域样式 */
+.texture-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+}
+
+.button-group .button {
+    flex: 1;
+}
+
+/* 贴图历史浏览器样式 */
+.texture-history {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background: #fff;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.history-item:hover {
+    background-color: #f5f5f5;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.history-item-info {
+    flex: 1;
+}
+
+.history-item-info .timestamp {
+    font-size: 12px;
+    color: #999;
+}
+
+/* 批量贴图控制样式 */
+.batch-texture {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+}
+
+.batch-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.batch-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.batch-options input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.similarity-threshold {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.similarity-threshold input[type="range"] {
+    margin: 4px 0;
+}
+
+/* 禁用状态样式 */
+.button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* 标题样式 */
+h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 12px;
+}
+
+/* 滚动条样式 */
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 控制选项样式 */
+.control-options {
+    margin-top: 12px;
+}
+
+/* 开关样式 */
+.toggle-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: .4s;
+    margin-right: 8px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--primary-color);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.texture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.texture-grid img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.texture-grid img:hover {
+    border-color: #4CAF50;
+}
+
+#folderInput {
+    margin: 10px 0;
+    width: 100%;
+}
+
+.model-info input[type="file"] {
+    margin: 5px 0;
+    width: 100%;
+}
+
+/* Hover highlight styles */
+.face-hover {
+    transition: opacity 0.2s ease;
+}
+
+/* Drag and drop styles */
+#modelViewer.drag-over {
+    border: 2px dashed #4CAF50;
+}
+
+.texture-preview-container {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+/* Add scrollbar styling */
+.texture-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.texture-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.texture-grid::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.texture-grid::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

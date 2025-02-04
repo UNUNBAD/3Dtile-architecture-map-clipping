@@ -1,0 +1,68 @@
+{
+  "name": "3DTILE_IMG_CUT",
+  "version": "1.0.0",
+  "description": "A 3D tile image cutting application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "node build.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "3DTiles",
+    "Image",
+    "Processing",
+    "Electron"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "cesium": "^1.125.0",
+    "electron": "^34.0.2",
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2",
+    "webpack-bundle-analyzer": "^4.10.2"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.2",
+    "@tweenjs/tween.js": "^25.0.0",
+    "babylonjs": "^7.47.2",
+    "babylonjs-gui": "^7.47.2",
+    "babylonjs-loaders": "^7.47.2"
+  },
+  "build": {
+    "appId": "com.your.app",
+    "productName": "图像处理工具",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/python",
+        "to": "python",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asar": true,
+    "ignore": [
+      "^/src/",
+      "^/test/",
+      "^/.git/",
+      "^/docs/",
+      ".map$",
+      ".md$"
+    ]
+  }
+}
