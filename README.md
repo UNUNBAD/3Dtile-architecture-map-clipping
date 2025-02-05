@@ -1,5 +1,14 @@
 # 3DTILE_IMG_CUT
-一个基于Electron的专业3D瓦片图像处理工具，提供图像编辑功能。
+一个基于Electron的专业3D瓦片图像处理工具，提供强大的3D数据处理和图像编辑功能。
+
+<div align="center">
+  <img src="./images/main-interface.jpg" alt="应用主界面" width="800"/>
+  <p><em>图1：应用程序主界面 - 支持3D模型加载</em></p>
+</div>
+<div align="center">
+  <img src="./images/image-processing.jpg" alt="图像处理功能" width="800"/>
+  <p><em>图像处理工具进行编辑和优化</em></p>
+</div>
 
 ## 技术栈
 - **Electron**: v34.0.2 - 跨平台桌面应用框架
@@ -56,6 +65,10 @@ npm start
 │   ├── img_cut.js     # 图像处理核心
 │   ├── view_sync.js   # 视图同步
 │   └── page3/         # 页面特定功能
+├── images/            # 文档图片资源
+│   ├── main-interface.jpg    # 主界面截图
+│   ├── 3d-model-loading.jpg  # 3D模型加载示例
+│   └── image-processing.jpg  # 图像处理示例
 ├── assets/            # 静态资源
 ├── main.js           # 主进程文件
 └── package.json      # 项目配置
@@ -103,6 +116,31 @@ Copy-Item "dist/python/001.exe" -Destination "dist/图像处理工具-win32-x64/
 - `Ctrl + S`: 保存当前工作
 - `Ctrl + Z`: 撤销操作
 - `Space`: 重置视图
+
+## 使用说明
+
+### 1. 启动界面
+<div align="center">
+  <img src="./images/main-interface.jpg" alt="启动界面" width="800"/>
+  <p><em>启动后的主界面，提供直观的操作入口</em></p>
+</div>
+
+### 2. 加载3D模型
+<div align="center">
+  <img src="./images/3d-model-loading.jpg" alt="3D模型加载" width="800"/>
+  <p><em>支持拖拽或点击按钮加载3D模型文件</em></p>
+</div>
+
+### 3. 图像处理
+<div align="center">
+  <img src="./images/image-processing.jpg" alt="图像处理功能" width="800"/>
+  <p><em>使用专业的图像处理工具进行编辑和优化</em></p>
+</div>
+
+### 4. 保存结果
+1. 点击保存按钮
+2. 选择保存位置
+![保存结果](./images/save-result.png)
 
 ## 联系方式
 - 项目维护者：[李佳祥]
