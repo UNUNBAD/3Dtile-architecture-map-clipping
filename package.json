@@ -22,7 +22,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "cesium": "^1.125.0",
-    "electron": "^34.0.2",
+    "electron": "^34.2.0",
     "electron-builder": "^24.9.1",
     "electron-packager": "^17.1.2",
     "webpack-bundle-analyzer": "^4.10.2"
