@@ -30,7 +30,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "@tweenjs/tween.js": "^25.0.0",
-    "babylonjs": "^7.47.2",
+    "babylonjs": "^7.50.0",
     "babylonjs-gui": "^7.47.2",
     "babylonjs-loaders": "^7.47.2"
   },
